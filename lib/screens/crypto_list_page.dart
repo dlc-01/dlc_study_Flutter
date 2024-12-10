@@ -7,6 +7,7 @@ class CryptoListPage extends StatelessWidget {
   final bool isLoading;
   final Function(Crypto) onToggleFavorite;
   final Function(Crypto) onToggleCart;
+  final Function(Crypto) onDeleteCrypto; // Новый коллбэк для удаления криптовалюты
 
   const CryptoListPage({
     Key? key,
@@ -14,6 +15,7 @@ class CryptoListPage extends StatelessWidget {
     required this.isLoading,
     required this.onToggleFavorite,
     required this.onToggleCart,
+    required this.onDeleteCrypto, // Передаем коллбэк
   }) : super(key: key);
 
   @override
@@ -24,17 +26,32 @@ class CryptoListPage extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: GridView.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.8,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
+          crossAxisCount: 2, // Количество элементов в строке
+          childAspectRatio: 0.8, // Соотношение сторон (ширина к высоте)
+          crossAxisSpacing: 10, // Отступы между элементами по горизонтали
+          mainAxisSpacing: 10, // Отступы между элементами по вертикали
         ),
         itemCount: cryptoList.length,
         itemBuilder: (context, index) {
-          return CryptoCard(
-            crypto: cryptoList[index],
-            onToggleFavorite: () => onToggleFavorite(cryptoList[index]),
-            onToggleCart: () => onToggleCart(cryptoList[index]),
+          final crypto = cryptoList[index];
+
+          return Dismissible(
+            key: ValueKey(crypto.id),
+            direction: DismissDirection.endToStart, // Свайп влево
+            background: Container(
+              color: Colors.red,
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: const Icon(Icons.delete, color: Colors.white),
+            ),
+            onDismissed: (direction) {
+              onDeleteCrypto(crypto); // Вызываем коллбэк для удаления
+            },
+            child: CryptoCard(
+              crypto: crypto,
+              onToggleFavorite: () => onToggleFavorite(crypto),
+              onToggleCart: () => onToggleCart(crypto),
+            ),
           );
         },
       ),

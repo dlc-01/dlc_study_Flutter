@@ -136,6 +136,18 @@ class _HomePageState extends State<HomePage> {
         .fold(0.0, (sum, current) => sum + current);
   }
 
+  void _deleteCrypto(Crypto crypto) {
+    setState(() {
+      _cryptoList.removeWhere((item) => item.id == crypto.id);
+      _favoriteList.removeWhere((item) => item.id == crypto.id);
+      _cart.remove(crypto);
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${crypto.name} удалена')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Widget> pages = [
@@ -144,6 +156,7 @@ class _HomePageState extends State<HomePage> {
         isLoading: _isLoading,
         onToggleFavorite: _toggleFavorite,
         onToggleCart: _toggleCart,
+        onDeleteCrypto: _deleteCrypto, // Передаем метод удаления
       ),
       FavoritesPage(
         favoriteList: _favoriteList,
