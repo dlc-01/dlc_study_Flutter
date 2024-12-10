@@ -1,28 +1,23 @@
 import 'package:flutter/material.dart';
 import '../models/crypto.dart';
-import '../screens/crypto_details_page.dart';
 
 class CryptoCard extends StatelessWidget {
   final Crypto crypto;
   final VoidCallback onToggleFavorite;
+  final VoidCallback onToggleCart; // Новый параметр для управления корзиной
 
   const CryptoCard({
     Key? key,
     required this.crypto,
     required this.onToggleFavorite,
+    required this.onToggleCart,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Открытие окна с деталями криптовалюты
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => CryptoDetailsPage(crypto: crypto),
-          ),
-        );
+        // Здесь можно добавить открытие деталей криптовалюты
       },
       child: Card(
         elevation: 4,
@@ -58,12 +53,26 @@ class CryptoCard extends StatelessWidget {
               style: const TextStyle(fontSize: 14),
             ),
             const SizedBox(height: 10),
-            IconButton(
-              icon: Icon(
-                crypto.isFavorite ? Icons.favorite : Icons.favorite_border,
-                color: crypto.isFavorite ? Colors.red : Colors.grey,
-              ),
-              onPressed: onToggleFavorite,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: Icon(
+                    crypto.isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: crypto.isFavorite ? Colors.red : Colors.grey,
+                  ),
+                  onPressed: onToggleFavorite,
+                ),
+                IconButton(
+                  icon: Icon(
+                    crypto.isInCart
+                        ? Icons.shopping_cart
+                        : Icons.shopping_cart_outlined,
+                    color: crypto.isInCart ? Colors.blue : Colors.grey,
+                  ),
+                  onPressed: onToggleCart,
+                ),
+              ],
             ),
           ],
         ),
