@@ -29,6 +29,8 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   http: ^1.2.2
+  email_validator: ^2.0.1
+  string_validator: ^1.1.0
   flutter:
     sdk: flutter
 

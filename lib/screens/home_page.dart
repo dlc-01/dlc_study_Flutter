@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'account_page.dart';
 import 'crypto_list_page.dart';
 import 'favorites_page.dart';
 import 'cart_page.dart';
@@ -154,6 +155,7 @@ class _HomePageState extends State<HomePage> {
         onRemoveFromCart: _removeFromCart,
         totalPrice: _calculateTotalPrice(),
       ),
+      AccountPage(),
     ];
 
     return Scaffold(
@@ -182,6 +184,7 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Криптовалюты'),
           BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Избранное'),
           BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Корзина'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Аккаунт'),
         ],
         currentIndex: _selectedIndex,
         onTap: (index) {
@@ -189,6 +192,8 @@ class _HomePageState extends State<HomePage> {
             _selectedIndex = index;
           });
         },
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.black54,
       ),
     );
   }

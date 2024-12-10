@@ -7,7 +7,7 @@ class Crypto {
   final double marketCap;
   final double priceChange24h;
   bool isFavorite;
-  bool isInCart; // Новое поле
+  bool isInCart;
 
   Crypto({
     required this.id,
@@ -18,7 +18,7 @@ class Crypto {
     required this.marketCap,
     required this.priceChange24h,
     this.isFavorite = false,
-    this.isInCart = false, // Изначально не в корзине
+    this.isInCart = false,
   });
 
   factory Crypto.fromJson(Map<String, dynamic> json, String imageUrl) {
