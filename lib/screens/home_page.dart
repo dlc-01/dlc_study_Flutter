@@ -147,6 +147,16 @@ class _HomePageState extends State<HomePage> {
       SnackBar(content: Text('${crypto.name} удалена')),
     );
   }
+  void _updateQuantity(Crypto crypto, double newQuantity) {
+    setState(() {
+      if (newQuantity <= 0) {
+        _cart.remove(crypto);
+        crypto.isInCart = false;
+      } else {
+        _cart[crypto] = newQuantity;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -167,6 +177,7 @@ class _HomePageState extends State<HomePage> {
         cart: _cart,
         onRemoveFromCart: _removeFromCart,
         totalPrice: _calculateTotalPrice(),
+        onUpdateQuantity: _updateQuantity,
       ),
       AccountPage(),
     ];
