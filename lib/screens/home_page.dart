@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/crypto.dart';
 import '../services/crypto_service.dart';
-import 'add_crypto_page.dart';
+import '../screens/favorites_page.dart';
+import '../screens/add_crypto_page.dart';
 import '../widgets/crypto_card.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,6 +15,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final CryptoService _cryptoService = CryptoService();
   List<Crypto> _cryptoList = [];
+  List<Crypto> _favoriteList = [];
   bool _isLoading = true;
 
   @override
@@ -37,10 +39,39 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _toggleFavorite(Crypto crypto) {
+    setState(() {
+      crypto.isFavorite = !crypto.isFavorite;
+      if (crypto.isFavorite) {
+        _favoriteList.add(crypto);
+      } else {
+        _favoriteList.removeWhere((item) => item.id == crypto.id);
+      }
+    });
+  }
+
+  void _navigateToFavorites() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FavoritesPage(favoriteCryptos: _favoriteList),
+      ),
+    );
+  }
+
   void _addNewCrypto(Crypto crypto) {
     setState(() {
       _cryptoList.add(crypto);
     });
+  }
+
+  void _navigateToAddCrypto() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AddCryptoPage(onAddCrypto: _addNewCrypto),
+      ),
+    );
   }
 
   @override
@@ -49,6 +80,12 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('Crypto Prices'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.favorite),
+            onPressed: _navigateToFavorites,
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -63,19 +100,15 @@ class _HomePageState extends State<HomePage> {
           ),
           itemCount: _cryptoList.length,
           itemBuilder: (context, index) {
-            return CryptoCard(crypto: _cryptoList[index]);
+            return CryptoCard(
+              crypto: _cryptoList[index],
+              onToggleFavorite: () => _toggleFavorite(_cryptoList[index]),
+            );
           },
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => AddCryptoPage(onAddCrypto: _addNewCrypto),
-            ),
-          );
-        },
+        onPressed: _navigateToAddCrypto,
         child: const Icon(Icons.add),
       ),
     );

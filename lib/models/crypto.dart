@@ -6,6 +6,7 @@ class Crypto {
   final double price;
   final double marketCap;
   final double priceChange24h;
+  bool isFavorite;
 
   Crypto({
     required this.id,
@@ -15,6 +16,7 @@ class Crypto {
     required this.price,
     required this.marketCap,
     required this.priceChange24h,
+    this.isFavorite = false,
   });
 
   factory Crypto.fromJson(Map<String, dynamic> json, String imageUrl) {
@@ -26,6 +28,7 @@ class Crypto {
       price: json['current_price']?.toDouble() ?? 0.0,
       marketCap: json['market_cap']?.toDouble() ?? 0.0,
       priceChange24h: json['price_change_percentage_24h']?.toDouble() ?? 0.0,
+      isFavorite: false,
     );
   }
 }
