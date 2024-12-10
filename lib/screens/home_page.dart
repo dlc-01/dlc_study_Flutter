@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> {
         _cart.remove(crypto);
         crypto.isInCart = false;
       } else {
-        _cart[crypto] = 0.0; // Добавляем в корзину с дефолтным количеством
+        _cart[crypto] = 1.0; // Добавляем в корзину с дефолтным количеством
         crypto.isInCart = true;
         _showAddToCartDialog(crypto);
       }
@@ -237,6 +237,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     setState(() {
                       _cart.remove(crypto);
+                      crypto.isInCart = false;
                     });
                   },
                 ),

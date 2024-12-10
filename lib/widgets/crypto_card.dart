@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import '../models/crypto.dart';
+import '../screens/crypto_details_page.dart';
 
 class CryptoCard extends StatelessWidget {
   final Crypto crypto;
   final VoidCallback onToggleFavorite;
-  final VoidCallback onToggleCart; // Новый параметр для управления корзиной
+  final VoidCallback onToggleCart;
 
   const CryptoCard({
     Key? key,
@@ -17,7 +18,13 @@ class CryptoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Здесь можно добавить открытие деталей криптовалюты
+        // Переход на экран деталей
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CryptoDetailsPage(crypto: crypto),
+          ),
+        );
       },
       child: Card(
         elevation: 4,
