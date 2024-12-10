@@ -15,7 +15,7 @@ class CryptoListPage extends StatelessWidget {
     required this.isLoading,
     required this.onToggleFavorite,
     required this.onToggleCart,
-    required this.onDeleteCrypto, // Передаем коллбэк
+    required this.onDeleteCrypto,
   }) : super(key: key);
 
   @override
@@ -26,10 +26,10 @@ class CryptoListPage extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: GridView.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2, // Количество элементов в строке
-          childAspectRatio: 0.8, // Соотношение сторон (ширина к высоте)
-          crossAxisSpacing: 10, // Отступы между элементами по горизонтали
-          mainAxisSpacing: 10, // Отступы между элементами по вертикали
+          crossAxisCount: 2,
+          childAspectRatio: 0.8,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
         ),
         itemCount: cryptoList.length,
         itemBuilder: (context, index) {
@@ -37,7 +37,7 @@ class CryptoListPage extends StatelessWidget {
 
           return Dismissible(
             key: ValueKey(crypto.id),
-            direction: DismissDirection.endToStart, // Свайп влево
+            direction: DismissDirection.endToStart,
             background: Container(
               color: Colors.red,
               alignment: Alignment.centerRight,
@@ -45,7 +45,7 @@ class CryptoListPage extends StatelessWidget {
               child: const Icon(Icons.delete, color: Colors.white),
             ),
             onDismissed: (direction) {
-              onDeleteCrypto(crypto); // Вызываем коллбэк для удаления
+              onDeleteCrypto(crypto);
             },
             child: CryptoCard(
               crypto: crypto,

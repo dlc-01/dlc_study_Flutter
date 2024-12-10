@@ -13,6 +13,27 @@ class CartPage extends StatelessWidget {
     required this.totalPrice,
   }) : super(key: key);
 
+  void _completePurchase(BuildContext context) {
+    if (cart.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Корзина пуста, покупка невозможна'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    // Очистить корзину и показать сообщение
+    cart.clear(); // Убедитесь, что это состояние передается и изменяется правильно в родительском виджете
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Покупка совершена!'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -53,9 +74,11 @@ class CartPage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: null,
+                onPressed: () {
+                  _completePurchase(context);
+                },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey,
+                  backgroundColor: Colors.blue,
                 ),
                 child: const Text(
                   'Сделать заказ',
