@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/crypto.dart';
 import '../services/crypto_service.dart';
-import '../screens/favorites_page.dart';
-import '../screens/add_crypto_page.dart';
 import '../widgets/crypto_card.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,6 +15,7 @@ class _HomePageState extends State<HomePage> {
   List<Crypto> _cryptoList = [];
   List<Crypto> _favoriteList = [];
   bool _isLoading = true;
+  int _selectedIndex = 0;
 
   @override
   void initState() {
@@ -50,66 +49,84 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _navigateToFavorites() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => FavoritesPage(favoriteCryptos: _favoriteList),
-      ),
-    );
-  }
-
-  void _addNewCrypto(Crypto crypto) {
+  void _onItemTapped(int index) {
     setState(() {
-      _cryptoList.add(crypto);
+      _selectedIndex = index;
     });
-  }
-
-  void _navigateToAddCrypto() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => AddCryptoPage(onAddCrypto: _addNewCrypto),
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> pages = [
+      _buildCryptoListPage(),
+      _buildFavoritesPage(),
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Crypto Prices'),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.favorite),
-            onPressed: _navigateToFavorites,
+      ),
+      body: pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'Криптовалюты',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Избранное',
           ),
         ],
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 0.8,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-          ),
-          itemCount: _cryptoList.length,
-          itemBuilder: (context, index) {
-            return CryptoCard(
-              crypto: _cryptoList[index],
-              onToggleFavorite: () => _toggleFavorite(_cryptoList[index]),
-            );
-          },
+    );
+  }
+
+  Widget _buildCryptoListPage() {
+    return _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.8,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
         ),
+        itemCount: _cryptoList.length,
+        itemBuilder: (context, index) {
+          return CryptoCard(
+            crypto: _cryptoList[index],
+            onToggleFavorite: () => _toggleFavorite(_cryptoList[index]),
+          );
+        },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _navigateToAddCrypto,
-        child: const Icon(Icons.add),
+    );
+  }
+
+  Widget _buildFavoritesPage() {
+    return _favoriteList.isEmpty
+        ? const Center(child: Text('Нет избранных криптовалют'))
+        : Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.8,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+        ),
+        itemCount: _favoriteList.length,
+        itemBuilder: (context, index) {
+          return CryptoCard(
+            crypto: _favoriteList[index],
+            onToggleFavorite: () => _toggleFavorite(_favoriteList[index]),
+          );
+        },
       ),
     );
   }
