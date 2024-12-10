@@ -156,7 +156,7 @@ class _HomePageState extends State<HomePage> {
         isLoading: _isLoading,
         onToggleFavorite: _toggleFavorite,
         onToggleCart: _toggleCart,
-        onDeleteCrypto: _deleteCrypto, // Передаем метод удаления
+        onDeleteCrypto: _deleteCrypto,
       ),
       FavoritesPage(
         favoriteList: _favoriteList,

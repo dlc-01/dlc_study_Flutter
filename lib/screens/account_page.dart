@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:email_validator/email_validator.dart';
-import 'package:string_validator/string_validator.dart';
+import 'package:email_validator/email_validator.dart'; // Для проверки email
+import 'package:string_validator/string_validator.dart'; // Для проверки телефона
+import 'package:shared_preferences/shared_preferences.dart'; // Для сохранения данных
 
 class AccountPage extends StatefulWidget {
   @override
@@ -14,14 +15,37 @@ class _AccountPageState extends State<AccountPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Данные успешно сохранены')),
-      );
-    }
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData(); // Загрузка данных при запуске
   }
 
+  /// Загружает сохраненные данные из SharedPreferences
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _firstNameController.text = prefs.getString('firstName') ?? '';
+      _lastNameController.text = prefs.getString('lastName') ?? '';
+      _emailController.text = prefs.getString('email') ?? '';
+      _phoneController.text = prefs.getString('phone') ?? '';
+    });
+  }
+
+  /// Сохраняет данные в SharedPreferences
+  Future<void> _saveUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('firstName', _firstNameController.text);
+    await prefs.setString('lastName', _lastNameController.text);
+    await prefs.setString('email', _emailController.text);
+    await prefs.setString('phone', _phoneController.text);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Данные успешно сохранены')),
+    );
+  }
+
+  /// Проверяет корректность email
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Введите email';
@@ -31,6 +55,7 @@ class _AccountPageState extends State<AccountPage> {
     return null;
   }
 
+  /// Проверяет корректность номера телефона
   String? _validatePhone(String? value) {
     if (value == null || value.isEmpty) {
       return 'Введите номер телефона';
@@ -38,6 +63,13 @@ class _AccountPageState extends State<AccountPage> {
       return 'Введите корректный номер телефона';
     }
     return null;
+  }
+
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      _saveUserData(); // Сохранение данных
+    }
   }
 
   @override
