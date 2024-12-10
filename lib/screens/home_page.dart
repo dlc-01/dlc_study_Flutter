@@ -177,7 +177,7 @@ class _HomePageState extends State<HomePage> {
         centerTitle: true,
       ),
       body: pages[_selectedIndex],
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: _selectedIndex == 0  ? FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
@@ -191,7 +191,8 @@ class _HomePageState extends State<HomePage> {
           );
         },
         child: const Icon(Icons.add),
-      ),
+      )
+      : null,
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Криптовалюты'),
