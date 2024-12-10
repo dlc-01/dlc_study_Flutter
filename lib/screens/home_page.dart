@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'crypto_list_page.dart';
+import 'favorites_page.dart';
+import 'cart_page.dart';
 import '../models/crypto.dart';
 import '../services/crypto_service.dart';
-import '../widgets/crypto_card.dart';
 import 'add_crypto_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,7 +17,7 @@ class _HomePageState extends State<HomePage> {
   final CryptoService _cryptoService = CryptoService();
   List<Crypto> _cryptoList = [];
   List<Crypto> _favoriteList = [];
-  Map<Crypto, double> _cart = {}; // Хранение криптовалют и их количества
+  Map<Crypto, double> _cart = {};
   bool _isLoading = true;
   int _selectedIndex = 0;
 
@@ -50,20 +52,6 @@ class _HomePageState extends State<HomePage> {
       }
     });
   }
-
-  void _toggleCart(Crypto crypto) {
-    setState(() {
-      if (_cart.containsKey(crypto)) {
-        _cart.remove(crypto);
-        crypto.isInCart = false;
-      } else {
-        _cart[crypto] = 1.0; // Добавляем в корзину с дефолтным количеством
-        crypto.isInCart = true;
-        _showAddToCartDialog(crypto);
-      }
-    });
-  }
-
   void _showAddToCartDialog(Crypto crypto) {
     final TextEditingController amountController = TextEditingController();
     showDialog(
@@ -88,13 +76,22 @@ class _HomePageState extends State<HomePage> {
             ),
             TextButton(
               onPressed: () {
-                final amount = double.tryParse(amountController.text) ?? 0.0;
-                if (amount > 0) {
+                final input = amountController.text.trim();
+                final amount = double.tryParse(input);
+
+                if (amount != null && amount > 0 && _isValidDecimalPlaces(input, 8)) {
                   setState(() {
                     _cart[crypto] = amount;
                   });
+                  Navigator.pop(ctx);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Введите корректное количество до 8 знаков после запятой'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
                 }
-                Navigator.pop(ctx);
               },
               child: const Text('Добавить'),
             ),
@@ -104,15 +101,31 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _addNewCrypto(Crypto crypto) {
+
+  bool _isValidDecimalPlaces(String input, int maxDecimalPlaces) {
+    if (input.contains('.')) {
+      final parts = input.split('.');
+      return parts[1].length <= maxDecimalPlaces;
+    }
+    return true;
+  }
+  void _toggleCart(Crypto crypto) {
     setState(() {
-      _cryptoList.add(crypto);
+      if (_cart.containsKey(crypto)) {
+        _cart.remove(crypto);
+        crypto.isInCart = false;
+      } else {
+        _cart[crypto] = 1.0;
+        crypto.isInCart = true;
+        _showAddToCartDialog(crypto);
+      }
     });
   }
 
-  void _onItemTapped(int index) {
+  void _removeFromCart(Crypto crypto) {
     setState(() {
-      _selectedIndex = index;
+      _cart.remove(crypto);
+      crypto.isInCart = false;
     });
   }
 
@@ -124,10 +137,23 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> pages = [
-      _buildCryptoListPage(),
-      _buildFavoritesPage(),
-      _buildCartPage(),
+    final List<Widget> pages = [
+      CryptoListPage(
+        cryptoList: _cryptoList,
+        isLoading: _isLoading,
+        onToggleFavorite: _toggleFavorite,
+        onToggleCart: _toggleCart,
+      ),
+      FavoritesPage(
+        favoriteList: _favoriteList,
+        onToggleFavorite: _toggleFavorite,
+        onToggleCart: _toggleCart,
+      ),
+      CartPage(
+        cart: _cart,
+        onRemoveFromCart: _removeFromCart,
+        totalPrice: _calculateTotalPrice(),
+      ),
     ];
 
     return Scaffold(
@@ -141,7 +167,11 @@ class _HomePageState extends State<HomePage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddCryptoPage(onAddCrypto: _addNewCrypto),
+              builder: (context) => AddCryptoPage(onAddCrypto: (crypto) {
+                setState(() {
+                  _cryptoList.add(crypto);
+                });
+              }),
             ),
           );
         },
@@ -149,113 +179,17 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'Криптовалюты',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Избранное',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: 'Корзина',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Криптовалюты'),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Избранное'),
+          BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: 'Корзина'),
         ],
         currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-      ),
-    );
-  }
-
-  Widget _buildCryptoListPage() {
-    return _isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.8,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-        ),
-        itemCount: _cryptoList.length,
-        itemBuilder: (context, index) {
-          return CryptoCard(
-            crypto: _cryptoList[index],
-            onToggleFavorite: () => _toggleFavorite(_cryptoList[index]),
-            onToggleCart: () => _toggleCart(_cryptoList[index]),
-          );
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
         },
       ),
-    );
-  }
-
-  Widget _buildFavoritesPage() {
-    return _favoriteList.isEmpty
-        ? const Center(child: Text('Нет избранных криптовалют'))
-        : Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.8,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-        ),
-        itemCount: _favoriteList.length,
-        itemBuilder: (context, index) {
-          return CryptoCard(
-            crypto: _favoriteList[index],
-            onToggleFavorite: () => _toggleFavorite(_favoriteList[index]),
-            onToggleCart: () => _toggleCart(_favoriteList[index]),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildCartPage() {
-    return Column(
-      children: [
-        Expanded(
-          child: _cart.isEmpty
-              ? const Center(child: Text('Корзина пуста'))
-              : ListView.builder(
-            itemCount: _cart.length,
-            itemBuilder: (context, index) {
-              final crypto = _cart.keys.elementAt(index);
-              final amount = _cart[crypto]!;
-              return ListTile(
-                leading: Image.network(crypto.imageUrl, width: 40),
-                title: Text(crypto.name),
-                subtitle: Text(
-                    'Количество: ${amount.toStringAsFixed(8)} (${(amount * crypto.price).toStringAsFixed(2)} \$)'),
-                trailing: IconButton(
-                  icon: const Icon(Icons.remove_circle_outline),
-                  onPressed: () {
-                    setState(() {
-                      _cart.remove(crypto);
-                      crypto.isInCart = false;
-                    });
-                  },
-                ),
-              );
-            },
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            'Итоговая стоимость: \$${_calculateTotalPrice().toStringAsFixed(2)}',
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
