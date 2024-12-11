@@ -7,7 +7,7 @@ class CryptoListPage extends StatelessWidget {
   final bool isLoading;
   final Function(Crypto) onToggleFavorite;
   final Function(Crypto) onToggleCart;
-  final Function(Crypto) onDeleteCrypto; // Новый коллбэк для удаления криптовалюты
+  final Function(Crypto) onDeleteCrypto;
 
   const CryptoListPage({
     Key? key,

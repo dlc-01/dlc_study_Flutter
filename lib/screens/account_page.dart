@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:email_validator/email_validator.dart'; // Для проверки email
-import 'package:string_validator/string_validator.dart'; // Для проверки телефона
-import 'package:shared_preferences/shared_preferences.dart'; // Для сохранения данных
+import 'package:email_validator/email_validator.dart';
+import 'package:string_validator/string_validator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AccountPage extends StatefulWidget {
   @override
@@ -18,10 +18,10 @@ class _AccountPageState extends State<AccountPage> {
   @override
   void initState() {
     super.initState();
-    _loadUserData(); // Загрузка данных при запуске
+    _loadUserData();
   }
 
-  /// Загружает сохраненные данные из SharedPreferences
+
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -32,7 +32,7 @@ class _AccountPageState extends State<AccountPage> {
     });
   }
 
-  /// Сохраняет данные в SharedPreferences
+
   Future<void> _saveUserData() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('firstName', _firstNameController.text);
@@ -45,7 +45,7 @@ class _AccountPageState extends State<AccountPage> {
     );
   }
 
-  /// Проверяет корректность email
+
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
       return 'Введите email';
@@ -55,7 +55,7 @@ class _AccountPageState extends State<AccountPage> {
     return null;
   }
 
-  /// Проверяет корректность номера телефона
+
   String? _validatePhone(String? value) {
     if (value == null || value.isEmpty) {
       return 'Введите номер телефона';
@@ -68,7 +68,7 @@ class _AccountPageState extends State<AccountPage> {
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      _saveUserData(); // Сохранение данных
+      _saveUserData();
     }
   }
 

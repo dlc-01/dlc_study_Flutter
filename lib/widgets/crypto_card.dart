@@ -18,7 +18,6 @@ class CryptoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Переход на экран деталей
         Navigator.push(
           context,
           MaterialPageRoute(
