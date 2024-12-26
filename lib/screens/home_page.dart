@@ -28,6 +28,7 @@ class _HomePageState extends State<HomePage> {
     _loadCryptoData();
   }
 
+
   Future<void> _loadCryptoData() async {
     try {
       final data = await _cryptoService.fetchCryptoData();
@@ -141,6 +142,7 @@ class _HomePageState extends State<HomePage> {
       _cryptoList.removeWhere((item) => item.id == crypto.id);
       _favoriteList.removeWhere((item) => item.id == crypto.id);
       _cart.remove(crypto);
+      _cryptoService.deleteCrypto(crypto.symbol);
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -157,6 +159,14 @@ class _HomePageState extends State<HomePage> {
       }
     });
   }
+  void _updateCryptoInList(Crypto updatedCrypto) {
+    setState(() {
+      final index = _cryptoList.indexWhere((crypto) => crypto.id == updatedCrypto.id);
+      if (index != -1) {
+        _cryptoList[index] = updatedCrypto;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -167,6 +177,7 @@ class _HomePageState extends State<HomePage> {
         onToggleFavorite: _toggleFavorite,
         onToggleCart: _toggleCart,
         onDeleteCrypto: _deleteCrypto,
+        onUpdateCrypto: _updateCryptoInList,
       ),
       FavoritesPage(
         favoriteList: _favoriteList,

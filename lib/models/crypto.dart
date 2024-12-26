@@ -6,6 +6,7 @@ class Crypto {
   final double price;
   final double marketCap;
   final double priceChange24h;
+  final String? description;
   bool isFavorite;
   bool isInCart;
 
@@ -17,6 +18,7 @@ class Crypto {
     required this.price,
     required this.marketCap,
     required this.priceChange24h,
+    this.description,
     this.isFavorite = false,
     this.isInCart = false,
   });
@@ -27,9 +29,10 @@ class Crypto {
       name: json['name'],
       symbol: json['symbol'],
       imageUrl: imageUrl,
-      price: json['current_price']?.toDouble() ?? 0.0,
-      marketCap: json['market_cap']?.toDouble() ?? 0.0,
-      priceChange24h: json['price_change_percentage_24h']?.toDouble() ?? 0.0,
+      price: json['priceUsd']?.toDouble() ?? 0.0,
+      marketCap: json['marketCapUsd;']?.toDouble() ?? 0.0,
+      priceChange24h: json['changePercent24Hr']?.toDouble() ?? 0.0,
+      description: json['description'],
     );
   }
 }

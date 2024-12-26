@@ -55,6 +55,10 @@ class CryptoDetailsPage extends StatelessWidget {
                 color: crypto.priceChange24h >= 0 ? Colors.green : Colors.red,
               ),
             ),
+            Text(
+              'Description: ${crypto.description ?? "..."}',
+              style: const TextStyle(fontSize: 16),
+            ),
           ],
         ),
       ),
